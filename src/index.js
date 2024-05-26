@@ -63,11 +63,10 @@
             let meta = await (await fetch(modLink)).text()
 
             //get rid of new lines so the regex doesnt commit break
-            meta = meta.replaceAll("\n","")
+            meta = meta.replaceAll("\n","&insertLineBreak;")
 
             let reg1 = /<meta name="description" content="([.\s\S]*?)">/g
-            let description = reg1.exec(meta)[1].replaceAll("&quot;",'"')
-            console.log(description)
+            let description = reg1.exec(meta)[1].replaceAll("&quot;",'"').replaceAll("&insertLineBreak;","\n")
 
             //finally, post to the webhook
             webhooks.forEach(async (webhook) => {
