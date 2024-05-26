@@ -1,4 +1,8 @@
 (async () => {
+    //some config so if someone wants to fork this they can easily get it setup for a different community
+    const checkDelay = 30*1000
+    const thunderstoreCommunity = 'https://thunderstore.io/c/bopl-battle'
+
     //requires
     const fs = require("fs")
     const fetch = require("node-fetch")
@@ -32,7 +36,7 @@
         let regex = /"(https:\/\/thunderstore\.io\/c\/bopl-battle\/p\/.+?)"/g
 
         //get the bopl battle thunderstore page's html
-        let data = await (await fetch("https://thunderstore.io/c/bopl-battle/?ordering=newest")).text()
+        let data = await (await fetch(thunderstoreCommunity+"/?ordering=newest")).text()
 
         //remove bepinex image and link (i'm probaly going to have to add r2modman to this later)
         data = data.replaceAll("https://thunderstore.io/c/bopl-battle/p/BepInEx/BepInExPack/", "")
@@ -79,5 +83,5 @@
     checkForMods()
 
     //starts the loop
-    setInterval(checkForMods, 30000)
+    setInterval(checkForMods, checkDelay)
 })()
