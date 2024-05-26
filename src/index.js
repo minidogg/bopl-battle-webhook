@@ -26,6 +26,7 @@
 
     //gets the last link
     let latestLink = fs.readFileSync("./lastLink.txt")
+    // let latestLink = ""
 
     //get the webhooks
     var webhooks = require("./webhooks.json")
@@ -58,13 +59,23 @@
             //get the image link using the imgRegex
             let img = imgRegex.exec(data)[1]
 
+            //fetch the mod page so we can take some meta tag data
+            let meta = await (await fetch(modLink)).text()
+
+            //get rid of new lines so the regex doesnt commit break
+            meta = meta.replaceAll("\n","")
+
+            let reg1 = /<meta name="description" content="([.\s\S]*?)">/g
+            let description = reg1.exec(meta)[1].replaceAll("&quot;",'"')
+            console.log(description)
+
             //finally, post to the webhook
             webhooks.forEach(async (webhook) => {
 
                 await post(webhook, {
                     "content": "New Mod <@&1175405777767387208> <@&1175405646993166346>",
                     "embeds": [{
-                        "description": `# [${name}](${modLink})  \nTeam: [${author}](https://thunderstore.io/c/bopl-battle/p/${author})`,
+                        "description": `# [${name}](${modLink})  \nTeam: [${author}](https://thunderstore.io/c/bopl-battle/p/${author})\n\n${description}`,
                         "image": {
                             "url": img
                         }
