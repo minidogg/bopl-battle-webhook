@@ -62,15 +62,13 @@
             webhooks.forEach(async (webhook) => {
 
                 await post(webhook, {
+                    "content": "New Mod <@&1175405777767387208> <@&1175405646993166346>",
                     "embeds": [{
                         "description": `# [${name}](${modLink})  \nTeam: [${author}](https://thunderstore.io/c/bopl-battle/p/${author})`,
                         "image": {
                             "url": img
                         }
                     }]
-                })
-                await post(webhook, {
-                    "content": "New Mod <@&1175405777767387208> <@&1175405646993166346>"
                 })
 
             })
