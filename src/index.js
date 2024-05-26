@@ -79,5 +79,5 @@
     checkForMods()
 
     //starts the loop
-    setInterval(checkForMods, 60000)
+    setInterval(checkForMods, 30000)
 })()
