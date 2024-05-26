@@ -65,6 +65,7 @@
             //get rid of new lines so the regex doesnt commit break
             meta = meta.replaceAll("\n","&insertLineBreak;")
 
+            //finally get the description
             let reg1 = /<meta name="description" content="([.\s\S]*?)">/g
             let description = reg1.exec(meta)[1].replaceAll("&quot;",'"').replaceAll("&insertLineBreak;","\n")
 
