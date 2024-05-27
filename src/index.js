@@ -35,7 +35,7 @@
         let regex = /"(https:\/\/thunderstore\.io\/c\/bopl-battle\/p\/.+?)"/g;
 
         // Get the bopl battle thunderstore page's HTML
-        let data = await (await fetch(thunderstoreCommunity + "/?ordering=newest")).text();
+        let data = await (await fetch(thunderstoreCommunity/* + "/?ordering=newest"*/)).text();
 
         // Remove BepInEx image and link (I'm probably going to have to add r2modman to this later)
         data = data.replaceAll("https://thunderstore.io/c/bopl-battle/p/BepInEx/BepInExPack/", "");
@@ -51,7 +51,7 @@
             let linkStuffs = /https:\/\/thunderstore\.io\/c\/bopl-battle\/p\/(.+)\/(.+)\//.exec(modLink);
 
             // Get the team and mod name from the linkStuffs array
-            let author = linkStuffs[1];
+            let author = linkStuffs[1]; 
             let name = linkStuffs[2];
 
             // Get the image link using the imgRegex
@@ -70,7 +70,7 @@
             // Finally, post to the webhook
             webhooks.forEach(async (webhook) => {
                 await post(webhook, {
-                    "content": "New Mod <@&1175405777767387208> <@&1175405646993166346>",
+                    "content": "New Mod/Update <@&1175405777767387208> <@&1175405646993166346>",
                     "embeds": [{
                         "title": name,
                         "description": `Team: [${author}](https://thunderstore.io/c/bopl-battle/p/${author})\n\n${description}\n \n **Download it here:** \n ${modLink}`,
