@@ -37,9 +37,17 @@
         // Get the bopl battle thunderstore page's HTML
         let data = await (await fetch(thunderstoreCommunity/* + "/?ordering=newest"*/)).text();
 
-        // Remove BepInEx image and link (I'm probably going to have to add r2modman to this later)
-        data = data.replaceAll("https://thunderstore.io/c/bopl-battle/p/BepInEx/BepInExPack/", "");
-        data = data.replaceAll("https://gcdn.thunderstore.io/live/repository/icons/BepInEx-BepInExPack-5.4.2100.png.256x256_q95_crop.png", "");
+        // Remove unwanted images and links because its easier than finding and removing pinned mods.
+        const unwanted = [
+            "https://thunderstore.io/c/bopl-battle/p/BepInEx/BepInExPack/", // bepinex pack
+            "https://gcdn.thunderstore.io/live/repository/icons/BepInEx-BepInExPack-5.4.2100.png.256x256_q95_crop.png", //bepinex pack icon
+            "https://thunderstore.io/c/bopl-battle/p/ebkr/r2modman/", // r2modman
+            "https://gcdn.thunderstore.io/live/repository/icons/ebkr-r2modman-3.1.49.png.256x256_q95_crop.png", //r2modman icon
+
+        ]
+        unwanted.forEach(unwantedLink=>{
+            data = data.replaceAll(unwantedLink, "")
+        })
 
         // Finally we get the mod link
         let modLink = regex.exec(data)[1];
