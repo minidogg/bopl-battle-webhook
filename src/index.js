@@ -1,7 +1,10 @@
 (async () => {
+    const sleep = ms=>new Promise(r=>setTimeout(r, ms))
+    const debugMode = false;
     // Some config so if someone wants to fork this they can easily get it setup for a different community
-    const checkDelay = 30 * 1000;
-    const thunderstoreCommunity = 'https://thunderstore.io/c/bopl-battle';
+    const checkDelay = 60 * 1000;
+    const community = 'bopl-battle';
+    const maxMods = 8;
 
     // Requires
     const fs = require("fs");
@@ -9,7 +12,7 @@
 
     // Create needed files
     if (!fs.existsSync("./webhooks.json")) fs.writeFileSync("./webhooks.json", "[]");
-    if (!fs.existsSync("./lastLink.txt")) fs.writeFileSync("./lastLink.txt", "");
+    if (!fs.existsSync("./lastLink.json")) fs.writeFileSync("./lastLink.json", "[]");
 
     // Helper function that makes it easier to post JSON to a URL
     async function post(url, json) {
@@ -23,77 +26,105 @@
         });
     }
 
-    // Gets the last link
-    let latestLink = fs.readFileSync("./lastLink.txt");
+
+    // Gets the last links
+    let latestLinks = JSON.parse(fs.readFileSync("./lastLink.json"));
 
     // Get the webhooks
     var webhooks = require("./webhooks.json");
 
-    // Function that checks to see if a new mod was released
-    const checkForMods = async () => {
-        // Regex for getting mod link
-        let regex = /"(https:\/\/thunderstore\.io\/c\/bopl-battle\/p\/.+?)"/g;
-
-        // Get the bopl battle thunderstore page's HTML
-        let data = await (await fetch(thunderstoreCommunity/* + "/?ordering=newest"*/)).text();
-
-        // Remove unwanted images and links because its easier than finding and removing pinned mods.
-        const unwanted = [
-            "https://thunderstore.io/c/bopl-battle/p/BepInEx/BepInExPack/", // bepinex pack
-            "https://gcdn.thunderstore.io/live/repository/icons/BepInEx-BepInExPack-5.4.2100.png.256x256_q95_crop.png", //bepinex pack icon
-            "https://thunderstore.io/c/bopl-battle/p/ebkr/r2modman/", // r2modman
-            "https://gcdn.thunderstore.io/live/repository/icons/ebkr-r2modman-3.1.49.png.256x256_q95_crop.png", //r2modman icon
-
-        ]
-        unwanted.forEach(unwantedLink=>{
-            data = data.replaceAll(unwantedLink, "")
-        })
-
-        // Finally we get the mod link
-        let modLink = regex.exec(data)[1];
-        if (modLink != latestLink) {
-            console.log("New mod was released! Epoch time: " + Date.now()); // Logging just because
-
-            // Regex for getting the image link and the mod team name and mod name
-            let imgRegex = /"(https:\/\/gcdn\.thunderstore\.io\/live\/repository\/icons\/.*?)"/g;
-            let linkStuffs = /https:\/\/thunderstore\.io\/c\/bopl-battle\/p\/(.+)\/(.+)\//.exec(modLink);
-
-            // Get the team and mod name from the linkStuffs array
-            let author = linkStuffs[1]; 
-            let name = linkStuffs[2];
-
-            // Get the image link using the imgRegex
-            let img = imgRegex.exec(data)[1];
-
-            // Fetch the mod page so we can take some meta tag data
-            let meta = await (await fetch(modLink)).text();
-
-            // Get rid of new lines so the regex doesn't commit break
-            meta = meta.replaceAll("\n", "&insertLineBreak;");
-
-            // Finally get the description
-            let reg1 = /<meta name="description" content="([.\s\S]*?)">/g;
-            let description = reg1.exec(meta)[1].replaceAll("&quot;", '"').replaceAll("&insertLineBreak;", "\n");
-
-            // Finally, post to the webhook
-            webhooks.forEach(async (webhook) => {
-                await post(webhook, {
-                    "content": "New Mod/Update <@&1175405777767387208> <@&1175405646993166346>",
-                    "embeds": [{
-                        "title": name,
-                        "description": `Team: [${author}](https://thunderstore.io/c/bopl-battle/p/${author})\n\n${description}\n \n **Download it here:** \n ${modLink}`,
-                        "url": modLink,
-                        "thumbnail": {
-                            "url": img
-                        }
-                    }]
-                });
-            });
+    //Mod Type
+    class Mod{
+        constructor(){
+            this.link = "";
+            this.name = "";
+            this.imageLink = "";
+            this.description = "";
+            this.author = "";
         }
-        // Set the latestLink and then update the lastLink.txt file
-        latestLink = modLink;
-        fs.writeFileSync("./lastLink.txt", latestLink);
-    };
+    }
+
+//Get mod links
+    async function GetModLinks(){
+        const blacklist = [
+            `https://thunderstore.io/c/${community}/p/ebkr/r2modman/`,
+            `https://thunderstore.io/c/${community}/p/BepInEx/BepInExPack/`
+        ]
+
+        let html = (await (await fetch(`https://thunderstore.io/c/${community}/`)).text())
+        blacklist.forEach(unwantedLink=>{
+            html = html.replaceAll(unwantedLink, "")
+        })    
+
+        let modLinks = []
+        let linkRegexString = `"(https:\/\/thunderstore\.io\/c\/${community}\/p\/.*?\/.*\/)"`
+        let linkRegex = new RegExp(linkRegexString)
+        while(new RegExp(linkRegexString).test(html)){
+            let newModLink = linkRegex.exec(html)[1]
+            modLinks.push(newModLink)
+            html = html.replace(new RegExp(linkRegexString), "")
+        }
+        if(debugMode==true)console.log("Mod Links", modLinks)
+        return modLinks
+    }
+
+    async function GetModFromLink(link){
+        let html = await (await fetch(link)).text()
+
+        let description = /<meta property="og:description" content="([\s\S]*?)" \/>/.exec(html)[1]
+
+        /*** @type {Mod} */
+        let mod = {
+            link,
+            name: /<meta property="og:title" content="([\s\S]*?)" \/>/.exec(html)[1],
+            imageLink: /<meta property="og:image" content="([\s\S]*?)" \/>/.exec(html)[1],
+            description,
+            author: /https:\/\/thunderstore\.io\/c\/bopl-battle\/p\/([\s\S]*?)\//.exec(link)[1]
+        }
+
+        return mod;
+    }
+
+
+    // Function that checks to see if a new mod was released
+    const checkForMods = async function(){
+        let links = await GetModLinks()
+        /*** @type {Array<Mod>} */
+        let mods = []
+        let i = 0;
+        for(let link of links){
+            if(i>=maxMods)break;
+            sleep(40)
+            mods.push(await GetModFromLink(link))
+            i++
+        }
+
+        if(JSON.stringify(latestLinks)!="[]"){
+            for(let i = 0;i<mods.length;i++){
+                if(JSON.stringify(latestLinks[i])!=JSON.stringify(mods[i])){
+                    let mod = mods[i]
+                    webhooks.forEach(async (webhook) => {
+                        await post(webhook, {
+                            "content": "New Mod/Update <@&1175405777767387208> <@&1175405646993166346>",
+                            "embeds": [{
+                                "title": mod.name,
+                                "description": `Team: [${mod.author}](https://thunderstore.io/c/bopl-battle/p/${mod.author})\n\n${mod.description}\n \n **Download it here:** \n ${mod.link}`,
+                                "url": mod.link,
+                                "thumbnail": {
+                                    "url": mod.imageLink
+                                }
+                            }]
+                        });
+                    });
+                    await sleep(20)
+                }
+            }
+        }
+
+
+        latestLinks = mods;
+        fs.writeFileSync("./lastLink.json", JSON.stringify(latestLinks), 'utf-8')
+    }
 
     // Does an initial check
     checkForMods();
