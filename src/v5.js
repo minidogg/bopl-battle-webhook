@@ -55,7 +55,6 @@ async function getMetadata(link){
 
 // The function that actually scans the thunderstore page
 async function scanThunderstore(){
-    console.log("started scan")
     let pageHtml = await (await fetch(thunderstore_url+"/c/"+community_id+"?"+mod_queries)).text()
     // const dom = new JSDOM();
     // let modLinks = Array.from(dom.window.document.querySelectorAll(".col-6.col-md-4.col-lg-3.mb-2.p-1.d-flex.flex-column")).map(e=>e.querySelector("a").href)
