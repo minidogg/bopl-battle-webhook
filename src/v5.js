@@ -17,7 +17,7 @@ const mod_queries = [
 ].map(e=>e.join("=")).join("&")
 const filteredOutModLinks = ["https://thunderstore.io/c/bopl-battle/p/ebkr/r2modman/", "https://thunderstore.io/c/bopl-battle/p/BepInEx/BepInExPack/"]
 const intervalTime = 60000
-const loopEnabled = false
+const loopEnabled = true
 
 // Make sure the Webhooks file exists and then get the webhook links from it.
 if (!fs.existsSync("./webhooks.json")) fs.writeFileSync("./webhooks.json", "[]");
