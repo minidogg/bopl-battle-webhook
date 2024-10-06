@@ -94,7 +94,7 @@ async function scanThunderstore(){
         console.log(link)
         let metadata = await getMetadata(link)
         let webhookMessageData = JSON.stringify({
-            "content": "New Mod <@&1175405777767387208> <@&1175405646993166346>",
+            "content": "New Mod/Update <@&1175405777767387208> <@&1175405646993166346>",
             "embeds": [{
                 "title": metadata.title,
                 "description": `Team: [${metadata.author}](${thunderstore_url}/c/${community_id}/p/${metadata.author})\n\n${metadata.description}\n \n **Download it here:** \n ${link}`,
