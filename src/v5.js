@@ -21,7 +21,7 @@ const loopEnabled = true
 
 // Make sure the Webhooks file exists and then get the webhook links from it.
 if (!fs.existsSync("./webhooks.json")) fs.writeFileSync("./webhooks.json", "[]");
-var webhooks = require("./webhooks.json");
+let webhooks = JSON.parse(fs.readFileSync("./webhooks.json", "utf-8"));
 
 // Variables related to storing links
 const lastLinksPath = path.resolve("./lastLinks.v5.json")
@@ -31,8 +31,12 @@ let lastLinks = JSON.parse(fs.readFileSync(lastLinksPath, "utf-8"))
 
 // Start the next iteration of the infinite loop.
 function loop(){
+    try{
     if(loopEnabled==false)return;
     setTimeout(scanThunderstore, intervalTime+Math.round(Math.random()*1000))
+    }catch(err){
+        console.error(err)
+    }
 }
 
 // Function for updating last links
@@ -90,7 +94,7 @@ async function scanThunderstore(){
         console.log(link)
         let metadata = await getMetadata(link)
         let webhookMessageData = JSON.stringify({
-            "content": "New Mod", // <@&1175405777767387208> <@&1175405646993166346>
+            "content": "New Mod <@&1175405777767387208> <@&1175405646993166346>",
             "embeds": [{
                 "title": metadata.title,
                 "description": `Team: [${metadata.author}](${thunderstore_url}/c/${community_id}/p/${metadata.author})\n\n${metadata.description}\n \n **Download it here:** \n ${link}`,
