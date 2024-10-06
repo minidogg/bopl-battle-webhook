@@ -116,4 +116,4 @@ async function scanThunderstore(){
     updateLastLinks(modLinks)
     loop()
 }
-scanThunderstore()
+loop()
