@@ -46,6 +46,7 @@ function require(name){
 }
 
 class FetchResponse{
+
   constructor(ufr){
     this.textString = ufr.getContentText()
   }
@@ -55,10 +56,13 @@ class FetchResponse{
 }
 function fetch(url, options){
   return new Promise((resolve)=>{
-    let response = new FetchResponse(UrlFetchApp.fetch(url, options))
+    let newOptions = options
+    if(options!=undefined)newOptions.payload = options.body
+    let response = new FetchResponse(UrlFetchApp.fetch(url, newOptions))
     resolve(response)
   })
 }
+
 function infinity(){
     // Replace this with all the code from v5.js but make sure to disable looping.
 }
