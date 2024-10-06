@@ -44,6 +44,7 @@
             "https://thunderstore.io/c/bopl-battle/p/ebkr/r2modman/", // r2modman
             "https://gcdn.thunderstore.io/live/repository/icons/ebkr-r2modman-3.1.49.png.256x256_q95_crop.png", //r2modman icon
 
+"https://gcdn.thunderstore.io/live/repository/icons/ebkr-r2modman-3.1.50_1JSysFW.png.128x128_q95.png", // new r2modmam version
         ]
         unwanted.forEach(unwantedLink=>{
             data = data.replaceAll(unwantedLink, "")
