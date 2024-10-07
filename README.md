@@ -1,5 +1,5 @@
-# bopl-battle-webhook
-Webhook thing for bopl battle
+# Bopl Battle Webhook
+Webhook thing for Bopl Battle
 
 # How to Host (WIP documentation)
 There are 2 methods to host the webhook. You can either use the Node.js version or the Google Sheets version. I prefer using the Google Sheets version because it is free hosting that runs 24/7.
