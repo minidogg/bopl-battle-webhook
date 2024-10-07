@@ -26,7 +26,7 @@ let webhooks = JSON.parse(fs.readFileSync("./webhooks.json", "utf-8"));
 // Variables related to storing links
 const lastLinksPath = path.resolve("./lastLinks.v5.json")
 let coldStart = !fs.existsSync(lastLinksPath)
-if(coldStart==true)fs.writeFileSync(lastLinksPath, "['webhook_url', 'ping roles. eg <@&ROLE_ID>']", "utf-8")
+if(coldStart==true)fs.writeFileSync(lastLinksPath, "[\n['webhook_url', 'ping roles. eg <@&ROLE_ID>']\n]", "utf-8")
 let lastLinks = JSON.parse(fs.readFileSync(lastLinksPath, "utf-8"))
 
 // Start the next iteration of the infinite loop.
