@@ -93,8 +93,8 @@ async function scanThunderstore(){
     for(let link of linkDifference){
         console.log(link)
         let metadata = await getMetadata(link)
-        let webhookMessageData = JSON.stringify({
-            "content": "New Mod/Update <@&1175405777767387208> <@&1175405646993166346>",
+        let webhookMessageData = JSON.stringify({ 
+            "content": "New Mod/Update ROLES",
             "embeds": [{
                 "title": metadata.title,
                 "description": `Team: [${metadata.author}](${thunderstore_url}/c/${community_id}/p/${metadata.author})\n\n${metadata.description}\n \n **Download it here:** \n ${link}`,
@@ -105,13 +105,13 @@ async function scanThunderstore(){
             }]
         })
         webhooks.forEach(async (webhook) => {
-            await fetch(webhook, {
+            await fetch(webhook[0], {
                 method: "post",
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: webhookMessageData
+                body: webhookMessageData.replace("ROLES", webhook[1])
             });
         });
     }
