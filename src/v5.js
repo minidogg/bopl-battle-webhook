@@ -88,13 +88,13 @@ async function scanThunderstore(config = providedConfig){
     // if(modLinks[0]!=lastLinks[0])linkDifference.push(modLinks[0])
     linkDifference = modLinks.filter(e=>!lastLinks.includes(e))
 
-    await PostLinksToDiscord(linkDifference)
+    await PostLinksToDiscord(linkDifference, config)
 
     updateLastLinks(modLinks)
     loop()
 }
 
-async function PostLinksToDiscord(linkDifference){
+async function PostLinksToDiscord(linkDifference, config){
     for(let link of linkDifference){
         console.log(link)
         let metadata = await getMetadata(link)
