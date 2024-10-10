@@ -14,7 +14,7 @@ const mod_queries = [
     ["ordering", "last-updated"],
     ["section", "mods"],
     ["q", ""],
-].map(e=>e.join("=")).join("&")
+].map(e=>e.join("=")).join("&" )
 const filteredOutModLinks = ["https://thunderstore.io/c/bopl-battle/p/ebkr/r2modman/", "https://thunderstore.io/c/bopl-battle/p/BepInEx/BepInExPack/"]
 const intervalTime = 60000
 const loopEnabled = true
@@ -49,9 +49,9 @@ function updateLastLinks(modLinks){
 async function getMetadata(link){
 	let html = await (await fetch(link)).text()
 	let metadata = {
-		"title":/<meta property="og:title" content="(.*?)" \/>/.exec(html)[1],
+		"title":/<meta property="og:title" content="([\s\S]*?)" \/>/.exec(html)[1],
 		"image":/<meta property="og:image" content="(.*?)" \/>/.exec(html)[1],
-		"description":/<meta property="og:description" content="(.*?)" \/>/.exec(html)[1],
+		"description":/<meta property="og:description" content="([\s\S]*?)" \/>/.exec(html)[1],
 		"author": /https:\/\/thunderstore\.io\/c\/.*?\/p\/(.*?)\/.*?\//.exec(html)[1]
 	}
 	return metadata
@@ -79,17 +79,9 @@ async function scanThunderstore(){
     }
 
     let linkDifference = []
-    if(modLinks[0]!=lastLinks[0])linkDifference.push(modLinks[0])
-    // let fakeI = 0;
-    // for(let realI = 0;realI<modLinks;realI++){
-    //     let i = realI-fakeI;
-    //     let v = modLinks[v] 
-    //     if(lastLinks[i] != v&&typeof(lastLinks[i])!="undefined"){
-    //         linkDifference.push(v)
-    //         fakeI++
-    //     }
-    // }
-    console.log(linkDifference)
+    // if(modLinks[0]!=lastLinks[0])linkDifference.push(modLinks[0])
+    linkDifference = modLinks.filter(e=>!lastLinks.includes(e))
+
     for(let link of linkDifference){
         console.log(link)
         let metadata = await getMetadata(link)
