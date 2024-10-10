@@ -2,6 +2,7 @@
 const sheetId = "10zL3bM0D1ZyXoY6C0bZ6KekOCSHpuqm7BmWXmPRRr_8"
 // var spreadsheet = SpreadsheetApp.getActive();
 const storageSize = 5
+const IS_GOOGLE_SHEETS = true;
 class fsHandler{
   getSpreadSheet(){
     return SpreadsheetApp.getActive()

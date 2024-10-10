@@ -3,21 +3,28 @@
 // const jsdom = require("jsdom");
 // const { JSDOM } = jsdom;
 
-const fs = require("fs")
+const fs = require("fs");
+const { type } = require("os");
 const path = require("path")
 
 // TODO: Move this into a config.json file
-const thunderstore_url = "https://thunderstore.io"
-const community_id = "bopl-battle"
-const mod_queries = [
-    // [key, value]
-    ["ordering", "last-updated"],
-    ["section", "mods"],
-    ["q", ""],
-].map(e=>e.join("=")).join("&" )
-const filteredOutModLinks = ["https://thunderstore.io/c/bopl-battle/p/ebkr/r2modman/", "https://thunderstore.io/c/bopl-battle/p/BepInEx/BepInExPack/"]
-const intervalTime = 60000
-const loopEnabled = true
+const providedConfig = {
+    thunderstore_url: "https://thunderstore.io",
+    community_id: "bopl-battle",
+    mod_queries: [
+        ["ordering", "last-updated"],
+        ["section", "mods"],
+        ["q", ""],
+    ],
+    filteredOutModLinks: ["https://thunderstore.io/c/bopl-battle/p/ebkr/r2modman/", "https://thunderstore.io/c/bopl-battle/p/BepInEx/BepInExPack/"],
+    intervalTime: 60000,
+    loopEnabled: true,
+    IS_GOOGLE_SHEETS: false
+}
+if(typeof(IS_GOOGLE_SHEETS)!="undefined"){
+    providedConfig.loopEnabled = false
+    providedConfig.IS_GOOGLE_SHEETS = true
+}
 
 // Make sure the Webhooks file exists and then get the webhook links from it.
 if (!fs.existsSync("./webhooks.json")) fs.writeFileSync("./webhooks.json", "[]");
@@ -32,7 +39,7 @@ let lastLinks = JSON.parse(fs.readFileSync(lastLinksPath, "utf-8"))
 // Start the next iteration of the infinite loop.
 function loop(){
     try{
-    if(loopEnabled==false)return;
+    if(providedConfig.loopEnabled==false)return;
     setTimeout(scanThunderstore, intervalTime+Math.round(Math.random()*1000))
     }catch(err){
         console.error(err)
@@ -58,18 +65,18 @@ async function getMetadata(link){
 }
 
 // The function that actually scans the thunderstore page
-async function scanThunderstore(){
-    let pageHtml = await (await fetch(thunderstore_url+"/c/"+community_id+"?"+mod_queries)).text()
+async function scanThunderstore(config = providedConfig){
+    let pageHtml = await (await fetch(config.thunderstore_url+"/c/"+config.community_id+"?"+config.mod_queries)).text()
     // const dom = new JSDOM();
     // let modLinks = Array.from(dom.window.document.querySelectorAll(".col-6.col-md-4.col-lg-3.mb-2.p-1.d-flex.flex-column")).map(e=>e.querySelector("a").href)
     let modLinks = []
-    let regex = new RegExp(`(${thunderstore_url}\/c\/${community_id}\/p\/.*?\/.*?\/)`, "gi");
+    let regex = new RegExp(`(${config.thunderstore_url}\/c\/${config.community_id}\/p\/.*?\/.*?\/)`, "gi");
     while(true){
         let link = regex.exec(pageHtml)
         if(link==null)break;
         modLinks.push(link[1])
     }
-    modLinks = modLinks.filter(e=>!filteredOutModLinks.includes(e))
+    modLinks = modLinks.filter(e=>!config.filteredOutModLinks.includes(e))
     
     if(coldStart==true){
         updateLastLinks(modLinks)
@@ -82,6 +89,13 @@ async function scanThunderstore(){
     // if(modLinks[0]!=lastLinks[0])linkDifference.push(modLinks[0])
     linkDifference = modLinks.filter(e=>!lastLinks.includes(e))
 
+    await PostLinksToDiscord(linkDifference)
+
+    updateLastLinks(modLinks)
+    loop()
+}
+
+async function PostLinksToDiscord(linkDifference){
     for(let link of linkDifference){
         console.log(link)
         let metadata = await getMetadata(link)
@@ -89,7 +103,7 @@ async function scanThunderstore(){
             "content": "New Mod/Update ROLES",
             "embeds": [{
                 "title": metadata.title,
-                "description": `Team: [${metadata.author}](${thunderstore_url}/c/${community_id}/p/${metadata.author})\n\n${metadata.description}\n \n **Download it here:** \n ${link}`,
+                "description": `Team: [${metadata.author}](${config.thunderstore_url}/c/${config.community_id}/p/${metadata.author})\n\n${metadata.description}\n \n **Download it here:** \n ${link}`,
                 "url": link,
                 "thumbnail": {
                     "url": metadata.image
@@ -107,8 +121,6 @@ async function scanThunderstore(){
             });
         });
     }
-
-    updateLastLinks(modLinks)
-    loop()
 }
+
 scanThunderstore()
