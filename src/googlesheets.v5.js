@@ -65,5 +65,5 @@ function fetch(url, options){
 }
 
 function infinity(){
-    // Replace this with all the code from v5.js but make sure to disable looping.
+    // Replace this with all the code from v5.js
 }
