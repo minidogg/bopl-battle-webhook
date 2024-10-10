@@ -40,7 +40,7 @@ let lastLinks = JSON.parse(fs.readFileSync(lastLinksPath, "utf-8"))
 function loop(){
     try{
     if(providedConfig.loopEnabled==false)return;
-    setTimeout(scanThunderstore, intervalTime+Math.round(Math.random()*1000))
+    setTimeout(scanThunderstore, providedConfig.intervalTime+Math.round(Math.random()*1000))
     }catch(err){
         console.error(err)
     }
