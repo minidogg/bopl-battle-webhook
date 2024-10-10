@@ -4,7 +4,6 @@
 // const { JSDOM } = jsdom;
 
 const fs = require("fs");
-const { type } = require("os");
 const path = require("path")
 
 // TODO: Move this into a config.json file
