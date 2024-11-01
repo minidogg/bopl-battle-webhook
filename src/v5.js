@@ -26,13 +26,13 @@ if(typeof(IS_GOOGLE_SHEETS)!="undefined"){
 }
 
 // Make sure the Webhooks file exists and then get the webhook links from it.
-if (!fs.existsSync("./webhooks.json")) fs.writeFileSync("./webhooks.json", "[]");
+if (!fs.existsSync("./webhooks.json")) fs.writeFileSync("./webhooks.json", "[\n['webhook_url', 'ping roles. eg <@&ROLE_ID>']\n]");
 let webhooks = JSON.parse(fs.readFileSync("./webhooks.json", "utf-8"));
 
 // Variables related to storing links
 const lastLinksPath = path.resolve("./lastLinks.v5.json")
 let coldStart = !fs.existsSync(lastLinksPath)
-if(coldStart==true)fs.writeFileSync(lastLinksPath, "[\n['webhook_url', 'ping roles. eg <@&ROLE_ID>']\n]", "utf-8")
+if(coldStart==true)fs.writeFileSync(lastLinksPath, "[]", "utf-8")
 let lastLinks = JSON.parse(fs.readFileSync(lastLinksPath, "utf-8"))
 
 // Start the next iteration of the infinite loop.
@@ -75,7 +75,7 @@ async function scanThunderstore(config = providedConfig){
         if(link==null)break;
         modLinks.push(link[1])
     }
-    modLinks = modLinks.filter(e=>!config.filteredOutModLinks.includes(e))
+    modLinks = modLinks.filter(e=>!config.filteredOutModLinks.includes(e)).splice(0, 5)
     
     if(coldStart==true){
         updateLastLinks(modLinks)
