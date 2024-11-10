@@ -1,0 +1,1 @@
+- Make the webhook only send a single ping per batch of mods uploaded.
