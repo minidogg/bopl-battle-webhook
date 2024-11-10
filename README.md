@@ -8,6 +8,6 @@ There are 2 methods to host the webhook. You can either use the Node.js version 
 You will need at least version 21 of Node.js.  
 
 # Credits
-[Unluckycrafter](https://github.com/minidogg) - Developed the server code.  
+[Unluckycrafter](https://github.com/minidogg) - Developed the server code. Now actively hosting it via Google Sheets.
 [AbstractMelon](https://github.com/abstractmelon) - Used to host the webhook for modding server. Helped out with the code a bit.
 [erewrwerwerwerwerwerwer](https://github.com/hecker7734) - Helped me discover that Google Sheets is great for this exact type of script. Helped out with the code a bit.
