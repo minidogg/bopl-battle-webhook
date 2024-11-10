@@ -106,7 +106,10 @@ async function PostLinksToDiscord(linkDifference, config){
                 "url": link,
                 "thumbnail": {
                     "url": metadata.image
-                }
+                },
+		"footer":{
+			"text":"***Powered by [Bopl Battle Mod Webhook](https://github.com/minidogg/bopl-battle-webhook) and [Thunderstore](https://thunderstore.io/)***"
+		}
             }]
         })
         webhooks.forEach(async (webhook) => {
